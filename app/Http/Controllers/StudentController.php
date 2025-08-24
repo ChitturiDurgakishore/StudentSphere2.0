@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\FileUpload;
 use App\Models\Subject;
 use App\Models\FileType;
+use Illuminate\Support\Facades\Http;
 
 class StudentController extends Controller
 {
@@ -150,4 +151,83 @@ class StudentController extends Controller
             'fileTypes' => $fileTypes
         ]);
     }
+
+    public function PreviousMaterials(Request $req)
+    {
+        $query = FileUpload::join('registration', 'file_uploads.uploaded_by', '=', 'registration.id')
+            ->select('file_uploads.*', 'registration.name as uploader_name');
+
+        if ($req->subject_id) {
+            $query->where('file_uploads.subject_id', $req->subject_id);
+        }
+
+        if ($req->branch) {
+            $query->where('file_uploads.branch', $req->branch);
+        }
+
+        if ($req->file_type_id) {
+            $query->where('file_uploads.file_type_id', $req->file_type_id);
+        }
+
+        $allFiles = $query->get();
+
+        $one = $allFiles->where('year', 1);
+        $two = $allFiles->where('year', 2);
+        $three = $allFiles->where('year', 3);
+        $four = $allFiles->where('year', 4);
+
+        $subjects = Subject::all();
+        $filetypes = FileType::all();
+        $branches = ['CSD', 'CSE', 'ECE', 'EEE', 'MECH', 'CIVIL']; // example
+
+        return view('student.previousmaterials', compact('one', 'two', 'three', 'four', 'subjects', 'filetypes', 'branches'));
+    }
+
+
+    //ChatBot feature
+
+
+
+public function ChatBot(Request $req)
+{
+    $message = $req->input('message');
+
+    // Call Gemini API
+    $reply = $this->askGemini($message);
+
+    return response()->json([
+        'reply' => $reply
+    ]);
+}
+
+private function askGemini($userMessage)
+{
+    $apiKey = env('GEMINI_API_KEY');
+
+    $url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' . $apiKey;
+
+    $payload = [
+        'contents' => [
+            [
+                'parts' => [
+                    ['text' => $userMessage]
+                ]
+            ]
+        ]
+    ];
+
+    try {
+        $response = Http::post($url, $payload);
+
+        if ($response->successful()) {
+            $data = $response->json();
+            return $data['candidates'][0]['content']['parts'][0]['text'] ?? "No response from Gemini 🤖";
+        } else {
+            return "Something went wrong with Gemini API ❌";
+        }
+    } catch (\Exception $e) {
+        return "Error: " . $e->getMessage();
+    }
+}
+
 }

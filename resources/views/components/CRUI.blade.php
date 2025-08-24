@@ -108,6 +108,11 @@
                 </a>
             </li>
             <li class="nav-item">
+                <a href="{{route('cr.GetFiles')}}" class="nav-link text-white {{ request()->routeIs('cr.GetFiles') ? 'active' : '' }}">
+                    <i class="bi bi-folder-check"></i>Study Materials
+                </a>
+            </li>
+            <li class="nav-item">
                 <a href="{{route('cr.Upload')}}" class="nav-link text-white {{ request()->routeIs('cr.Upload') ? 'active' : '' }}">
                     <i class="bi bi-cloud-arrow-up"></i> Upload Files
                 </a>
@@ -117,11 +122,16 @@
                     <i class="bi bi-folder-check"></i> My Uploaded Files
                 </a>
             </li>
+            <li class="nav-item">
+                <a href="{{route('cr.PreviousMaterials')}}" class="nav-link text-white {{ request()->routeIs('cr.PreviousMaterials') ? 'active' : '' }}">
+                    <i class="bi bi-folder-check"></i>Previous Year Materials
+                </a>
+            </li>
         </ul>
 
         <!-- Logout at bottom -->
         <div class="px-3 pb-4">
-            <a href="{{route('cr.logout')}}" class="nav-link text-white logout-link">
+            <a href="{{route('student.logout')}}" class="nav-link text-white logout-link">
                 <i class="bi bi-box-arrow-right"></i> Logout
             </a>
         </div>
@@ -131,7 +141,7 @@
     <div class="main-content">
         <!-- Header -->
         <header class="header bg-white d-flex align-items-center px-4">
-            <h5 class="mb-0 text-dark">{{ $headerTitle ?? 'Dashboard' }}</h5>
+            <h5 class="mb-0 text-dark">{{ $headerTitle ?? 'CR Dashboard' }}</h5>
         </header>
 
         <!-- Dynamic content -->

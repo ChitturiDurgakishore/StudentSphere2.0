@@ -128,4 +128,86 @@ class CrController extends Controller
             return redirect()->back()->with('error', 'Replace failed: ' . $e->getMessage());
         }
     }
+
+    public function MaterialsData(Request $req)
+    {
+        $branch = session('branch');
+        $year = session('year');
+
+        if (!$branch || !$year) {
+            return redirect()->back()->with('error', 'Year or branch not set in session.');
+        }
+
+        // Start query for files
+        $query = FileUpload::query();
+
+        // Join registration to get uploader name
+        $query->leftJoin('registration', 'file_uploads.uploaded_by', '=', 'registration.id')
+            ->addSelect('file_uploads.*', 'registration.name as uploader_name');
+
+        // Join subjects to get subject name
+        $query->leftJoin('subjects', 'file_uploads.subject_id', '=', 'subjects.id')
+            ->addSelect('subjects.subject_name');
+
+        // Join file_types to get file type name
+        $query->leftJoin('file_types', 'file_uploads.file_type_id', '=', 'file_types.id')
+            ->addSelect('file_types.file_type as file_type_name');
+
+        // Filter by branch and year
+        $query->where('file_uploads.branch', $branch)
+            ->where('file_uploads.year', $year);
+
+        // Optional filters from request (subject, type, unit)
+        if ($req->subject_id) {
+            $query->where('file_uploads.subject_id', $req->subject_id);
+        }
+        if ($req->file_type_id) {
+            $query->where('file_uploads.file_type_id', $req->file_type_id);
+        }
+        if ($req->unit) {
+            $query->where('file_uploads.unit', $req->unit);
+        }
+
+        $files = $query->get();
+
+        // Get all subjects and file types for the filter form
+        $subjects = Subject::where('year', $year)->where('branch', $branch)->get();
+        $fileTypes = FileType::all();
+
+        return view('cr.materials', [
+            'files' => $files,
+            'subjects' => $subjects,
+            'fileTypes' => $fileTypes
+        ]);
+    }
+    public function PreviousMaterials(Request $req)
+    {
+        $query = FileUpload::join('registration', 'file_uploads.uploaded_by', '=', 'registration.id')
+            ->select('file_uploads.*', 'registration.name as uploader_name');
+
+        if ($req->subject_id) {
+            $query->where('file_uploads.subject_id', $req->subject_id);
+        }
+
+        if ($req->branch) {
+            $query->where('file_uploads.branch', $req->branch);
+        }
+
+        if ($req->file_type_id) {
+            $query->where('file_uploads.file_type_id', $req->file_type_id);
+        }
+
+        $allFiles = $query->get();
+
+        $one = $allFiles->where('year', 1);
+        $two = $allFiles->where('year', 2);
+        $three = $allFiles->where('year', 3);
+        $four = $allFiles->where('year', 4);
+
+        $subjects = Subject::all();
+        $filetypes = FileType::all();
+        $branches = ['CSD','CSE', 'ECE', 'EEE', 'MECH', 'CIVIL']; // example
+
+        return view('cr.previousmaterials', compact('one', 'two', 'three', 'four', 'subjects', 'filetypes', 'branches'));
+    }
 }

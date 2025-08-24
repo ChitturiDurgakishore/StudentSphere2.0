@@ -216,8 +216,11 @@
             }
 
             aside nav a.logout {
-                margin-top: 0;
-                margin-left: auto;
+                color: var(--danger);
+            }
+
+            aside nav a.logout:hover {
+                background-color: rgba(230, 57, 70, 0.1);
             }
 
             main {
@@ -252,7 +255,11 @@
                         <i class="bi bi-journal-bookmark"></i>
                         Study Materials
                     </a>
-                    <a href="#">
+                    <a href="{{ route('student.PreviousMaterials') }}">
+                        <i class="bi bi-person"></i>
+                        Previous Year Materials
+                    </a>
+                    <a href="{{ route('chatbot') }}">
                         <i class="bi bi-robot"></i>
                         Chatbot
                     </a>

@@ -18,7 +18,10 @@ Route::get('/', function () {
 Route::view('/register', 'welcome');
 Route::post('/Registration', [StudentController::class, 'Registration'])->name('Register');
 Route::view('/login', 'login');
-Route::get('/Login', [StudentController::class, 'Login'])->name('Login');
+Route::get('/Login', [StudentController::class, 'Login'])->name('login');
+Route::get('/student/logout', [StudentController::class, 'Logout'])->name('student.logout');
+Route::view('/chatbot','student.chatbot')->name('chatbot');
+Route::match(['get', 'post'], '/student/chatbot', [StudentController::class, 'ChatBot'])->name('student.chatbot');
 
 
 Route::middleware(['auth', RoleMiddleware::class . ':student'])->group(function () {
@@ -26,7 +29,11 @@ Route::middleware(['auth', RoleMiddleware::class . ':student'])->group(function 
         return view('student.dashboard');
     })->name('student.dashboard');
     Route::get('/student/Materials',[StudentController::class,'MaterialsData'])->name('student.Materials');
-    Route::get('/student/logout', [StudentController::class, 'Logout'])->name('student.logout');
+
+
+    //previous year
+    Route::get('/student/previousmaterials',[StudentController::class,'PreviousMaterials'])->name('student.PreviousMaterials');
+
 });
 
 Route::middleware(['auth', RoleMiddleware::class . ':admin'])->group(function () {
@@ -68,7 +75,16 @@ Route::middleware(['auth', RoleMiddleware::class . ':cr'])->group(function () {
     Route::post('/cr/replace-file/{id}', [CrController::class, 'replaceFile'])->name('cr.replaceFile');
 
     Route::get('/cr/logout', [StudentController::class, 'Logout'])->name('cr.logout');
-});
- // Google OAuth Routes
-    Route::get('/auth/google', [GoogleDriveController::class, 'redirectToGoogle'])->name('google.login');
+
+     // Google OAuth Routes
+     Route::get('/auth/google', [GoogleDriveController::class, 'redirectToGoogle'])->name('google.login');
     Route::get('/auth/google/callback', [GoogleDriveController::class, 'handleGoogleCallback']);
+
+    //Normal Study Materials
+    Route::get('/cr/study-materials',[CrController::class,'MaterialsData'])->name('cr.GetFiles');
+    Route::get('/cr/Materials',[CrController::class,'MaterialsData'])->name('cr.Materials');
+    Route::get('/cr/previousmaterials',[CrController::class,'PreviousMaterials'])->name('cr.PreviousMaterials');
+
+});
+
+

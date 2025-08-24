@@ -86,7 +86,7 @@
             <h4 class="mb-0">{{ $headerTitle ?? 'Dashboard' }}</h4>
             <div>
                 <span class="me-3 user-greeting">Hello, {{ auth()->user()->name ?? 'Admin' }}</span>
-                <a href="#" class="text-danger logout-link">
+                <a href="{{route('student.logout')}}" class="text-danger logout-link">
                     <i class="bi bi-box-arrow-right me-1"></i> Logout
                 </a>
             </div>

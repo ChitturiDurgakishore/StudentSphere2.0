@@ -1,4 +1,5 @@
 <x-studentUI>
+    <x-slot name="MainContent">
     <!-- User Details Card -->
     <section class="profile-card">
         <div class="card-header">
@@ -182,4 +183,5 @@
             }
         }
     </style>
+    </x-slot>
 </x-studentUI>
