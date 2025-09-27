@@ -74,13 +74,16 @@ class CrController extends Controller
         $year = session('year');
         $branch = session('branch');
 
-        $files = FileUpload::where('year', $year)
+        // Fetch files for the user filtered by year and branch
+        $files = FileUpload::with('subject', 'fileType') // eager load relations
+            ->where('year', $year)
             ->where('branch', $branch)
             ->where('uploaded_by', $userId)
             ->get();
 
         return view('cr.Uploaded', ['subjects' => $files]);
     }
+
 
     // Delete file
     public function deleteFile($id)
@@ -180,34 +183,43 @@ class CrController extends Controller
             'fileTypes' => $fileTypes
         ]);
     }
+
+
     public function PreviousMaterials(Request $req)
-    {
-        $query = FileUpload::join('registration', 'file_uploads.uploaded_by', '=', 'registration.id')
-            ->select('file_uploads.*', 'registration.name as uploader_name');
+{
+    // Build query with join and eager load relations
+    $query = FileUpload::with('fileType', 'subject', 'uploader')
+        ->join('registration', 'file_uploads.uploaded_by', '=', 'registration.id')
+        ->select('file_uploads.*', 'registration.name as uploader_name');
 
-        if ($req->subject_id) {
-            $query->where('file_uploads.subject_id', $req->subject_id);
-        }
-
-        if ($req->branch) {
-            $query->where('file_uploads.branch', $req->branch);
-        }
-
-        if ($req->file_type_id) {
-            $query->where('file_uploads.file_type_id', $req->file_type_id);
-        }
-
-        $allFiles = $query->get();
-
-        $one = $allFiles->where('year', 1);
-        $two = $allFiles->where('year', 2);
-        $three = $allFiles->where('year', 3);
-        $four = $allFiles->where('year', 4);
-
-        $subjects = Subject::all();
-        $filetypes = FileType::all();
-        $branches = ['CSD','CSE', 'ECE', 'EEE', 'MECH', 'CIVIL']; // example
-
-        return view('cr.previousmaterials', compact('one', 'two', 'three', 'four', 'subjects', 'filetypes', 'branches'));
+    // Apply filters if provided
+    if ($req->subject_id) {
+        $query->where('file_uploads.subject_id', $req->subject_id);
     }
+
+    if ($req->branch) {
+        $query->where('file_uploads.branch', $req->branch);
+    }
+
+    if ($req->file_type_id) {
+        $query->where('file_uploads.file_type_id', $req->file_type_id);
+    }
+
+    // Get all filtered files
+    $allFiles = $query->get();
+
+    // Split files by year
+    $one = $allFiles->where('year', 1);
+    $two = $allFiles->where('year', 2);
+    $three = $allFiles->where('year', 3);
+    $four = $allFiles->where('year', 4);
+
+    // Fetch additional data for filters in view
+    $subjects = Subject::all();
+    $filetypes = FileType::all();
+    $branches = ['CSD', 'CSE', 'ECE', 'EEE', 'MECH', 'CIVIL']; // example
+
+    return view('cr.previousmaterials', compact('one', 'two', 'three', 'four', 'subjects', 'filetypes', 'branches'));
+}
+
 }

@@ -39,7 +39,7 @@
                                     <td>{{ $index + 1 }}</td>
                                     <td>{{ $file->subject->subject_name ?? 'N/A' }}</td>
                                     <td>{{ $file->description ?? '-' }}</td>
-                                    <td>{{ strtoupper($file->file_type) }}</td>
+                                    <td>{{ strtoupper($file->fileType->file_type ?? '-') }}</td>
                                     <td>{{ $file->unit }}</td>
                                     <td>{{ $file->year }}</td>
                                     <td>{{ $file->branch }}</td>
@@ -48,13 +48,14 @@
                                             View File
                                         </a>
                                     </td>
-                                    <td>{{ $file->created_at }}</td>
+                                    <td>{{ $file->uploaded_at }}</td>
                                     <td>
                                         {{-- Delete --}}
                                         <form action="{{ route('cr.deleteFile', $file->id) }}" method="POST" style="display:inline;">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-sm btn-danger"
+                                                style="padding: 2px 6px;"
                                                 onclick="return confirm('Are you sure you want to delete this file?');">
                                                 Delete
                                             </button>
@@ -64,7 +65,9 @@
                                         <form class="replace-form" action="{{ route('cr.replaceFile', $file->id) }}" method="POST" enctype="multipart/form-data" style="display:inline;">
                                             @csrf
                                             <input type="file" name="file" class="replace-input" style="display:none;">
-                                            <button type="button" class="btn btn-sm btn-warning replace-btn">Replace</button>
+                                            <button type="button" class="btn btn-sm btn-warning replace-btn" style="padding: 2px 6px;">
+                                                Replace
+                                            </button>
                                         </form>
                                     </td>
                                 </tr>

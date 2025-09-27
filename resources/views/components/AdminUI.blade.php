@@ -71,10 +71,7 @@
                 <i class="bi bi-folder me-2"></i> View Files
             </a>
 
-            <h6 class="section-heading text-muted mt-3">Account</h6>
-            <a class="nav-link text-white ms-3" href="#">
-                <i class="bi bi-key me-2"></i> Change Password
-            </a>
+
         </nav>
     </aside>
 

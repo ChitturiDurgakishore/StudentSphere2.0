@@ -9,6 +9,20 @@ use Illuminate\Http\Request;
 
 class AdminController extends Controller
 {
+
+
+
+
+    public function dashboard()
+    {
+        $totalUsers = Registration::count();
+        $totalStudents = Registration::where('role', 'student')->count();
+        $totalCRs = Registration::where('role', 'cr')->count();
+        $totalFiles = FileUpload::count();
+
+        return view('admin.dashboard', compact('totalUsers', 'totalStudents', 'totalCRs', 'totalFiles'));
+    }
+
     public function UsersData(Request $req)
     {
 
@@ -123,4 +137,54 @@ class AdminController extends Controller
 
         return back()->with('error', 'File not found ❌');
     }
+
+    // SubjectController.php
+    public function store(Request $request)
+    {
+        $request->validate([
+            'subject_name' => 'required|string|max:255',
+            'year' => 'required|integer|min:1|max:4',
+            'branch' => 'required|string|max:50',
+        ]);
+
+        Subject::create([
+            'subject_name' => $request->subject_name,
+            'year' => $request->year,
+            'branch' => $request->branch,
+        ]);
+
+        return redirect()->back()->with('success', 'Subject added successfully!');
+    }
+
+    // Add this inside AdminController
+
+// Update Subject
+public function update(Request $request, $id)
+{
+    $request->validate([
+        'subject_name' => 'required|string|max:255',
+        'year' => 'required|integer|min:1|max:4',
+        'branch' => 'required|string|max:50',
+    ]);
+
+    $subject = Subject::findOrFail($id);
+    $subject->update([
+        'subject_name' => $request->subject_name,
+        'year' => $request->year,
+        'branch' => $request->branch,
+    ]);
+
+    return redirect()->back()->with('success', 'Subject updated successfully!');
+}
+
+// Delete Subject
+public function destroy($id)
+{
+    $subject = Subject::findOrFail($id);
+    $subject->delete();
+
+    return redirect()->back()->with('success', 'Subject deleted successfully!');
+}
+
+
 }

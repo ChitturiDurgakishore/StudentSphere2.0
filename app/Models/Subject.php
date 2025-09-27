@@ -11,7 +11,7 @@ class Subject extends Model
     protected $table = 'subjects';
 
     protected $fillable = [
-        'subject_name','year',
+        'subject_name','year','branch',
     ];
     public $timestamps=false;
 }
